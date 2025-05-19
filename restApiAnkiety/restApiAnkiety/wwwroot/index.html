@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Ankieta</title>
+</head>
+<body>
+    <h2>Ankieta</h2>
+
+    <h3>Czy odpowiada Ci taka forma kursu?</h3>
+    <input type="radio" id="formaTak" name="forma" value="Tak" />
+    <label for="formaTak">Tak</label>
+    <input type="radio" id="formaNie" name="forma" value="Nie" />
+    <label for="formaNie">Nie</label>
+
+    <h3>Czy dwie lekcje tygodniowo to: </h3>
+    <input type="checkbox" name="czestosc" value="Za dużo" />Za dużo<br />
+    <input type="checkbox" name="czestosc" value="Za mało" />Za mało<br />
+    <input type="checkbox" name="czestosc" value="W sam raz" />W sam raz<br />
+
+    <h3>Jaką tematyką kolejnego kursu byłbyś/-abyś zainteresowany/-na?</h3>
+    <input type="checkbox" name="tematyka" value="Biznes" />Biznes<br />
+    <input type="checkbox" name="tematyka" value="Rozmowa o pracę" />Rozmowa o pracę<br />
+    <input type="checkbox" name="tematyka" value="Wakacje" />Wakacje<br />
+    <input type="checkbox" name="tematyka" value="Święta Wielkanocne" />Święta Wielkanocne<br />
+    <input type="checkbox" name="tematyka" value="Internet" />Internet<br />
+    <input type="checkbox" name="tematyka" value="Inną, jaką?" />Inną, jaką?<br />
+
+    <button id="submitBtn">Prześlij</button>
+
+    <script>
+        function pobierzWartosciCheckboxow(nazwa) {
+            return Array.from(document.querySelectorAll(`input[name="${nazwa}"]:checked`)).map(cb => cb.value);
+        }
+
+        function pobierzWybranaOpcjeRadio(nazwa) {
+            const radio = document.querySelector(`input[name="${nazwa}"]:checked`);
+            return radio ? radio.value : null;
+        }
+
+        document.getElementById("submitBtn").addEventListener("click", function (event) {
+            event.preventDefault();
+
+            const forma = pobierzWybranaOpcjeRadio("forma");
+            const czestosc = pobierzWartosciCheckboxow("czestosc");
+            const tematyka = pobierzWartosciCheckboxow("tematyka");
+
+            if (!forma) {
+                alert("Wybierz opcję dotyczącą formy kursu.");
+                return;
+            }
+
+            const dane = {
+                Forma: forma,
+                Czestosc: czestosc,
+                Tematyka: tematyka
+            };
+
+            fetch("https://localhost:7094/api/ankieta/odpowiedz", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dane)
+            })
+                .then(res => {
+                    if (res.ok) alert("Dziękujemy za przesłanie ankiety!");
+                    else alert("Błąd przesyłania.");
+                })
+                .catch(() => alert("Błąd przesyłania."));
+        });
+    </script>
+</body>
+</html>
